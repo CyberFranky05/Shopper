@@ -1,5 +1,6 @@
 package com.piyush.data.network
 
+import android.util.Log
 import com.piyush.data.model.DataProductModel
 import com.piyush.domain.model.Product
 import com.piyush.domain.network.NetworkService
@@ -20,14 +21,21 @@ import kotlinx.io.IOException
 
 
 class NetworkServiceImpl(val client: HttpClient) : NetworkService {
-    override suspend fun getProducts(): ResultWrapper<List<Product>> {
-        return makeWebRequest(
-            url = "https://fakestoreapi.com/products",
+    private val baseUrl = "https://fakestoreapi.com"
+    override suspend fun getProducts(category: String?): ResultWrapper<List<Product>> {
+        val url =
+        if (category != null) "$baseUrl/products/category/$category" else "$baseUrl/products"
+
+
+        val output =  makeWebRequest(
+            url = url,
             method = HttpMethod.Get,
             mapper = { dataModels: List<DataProductModel> ->
                 dataModels.map { it.toProduct() }
             }
         )
+        Log.d("NetworkServiceImpl", "Fetched products for category $category: $output")
+        return  output
     }
 
     @OptIn(InternalAPI::class)

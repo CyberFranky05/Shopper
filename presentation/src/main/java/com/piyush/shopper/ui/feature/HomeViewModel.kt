@@ -1,5 +1,6 @@
 package com.piyush.shopper.ui.feature
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,35 +16,47 @@ class HomeViewModel (private val getProductUseCase: GetProductUseCase): ViewMode
     val uiState = _uiState.asStateFlow()
 
     init {
-        getProduct()
+        getAllProducts()
+    }
+
+    private fun getAllProducts(){
+        viewModelScope.launch {
+            _uiState.value = HomeScreenUIEvents.Loading
+            val featured = getProduct("electronics")
+            val popularProducts = getProduct("jewelery")
+            if(featured.isEmpty()|| popularProducts.isEmpty()){
+                _uiState.value = HomeScreenUIEvents.Error("Failed to load products")
+                return@launch
+            }
+            _uiState.value = HomeScreenUIEvents.Success(featured,popularProducts)
+        }
     }
 
 
-    fun getProduct(){
-        viewModelScope.launch {
+    private suspend fun getProduct(category: String): List<Product>{
+
             _uiState.value = HomeScreenUIEvents.Loading
-            getProductUseCase.execute().let { result ->
+            getProductUseCase.execute(category).let { result ->
                 when(result){
                     is ResultWrapper.Success -> {
-                        val data = (result).value
-                        _uiState.value = HomeScreenUIEvents.Success(data)
+                        return (result).value
                     }
 
                     is ResultWrapper.Failure -> {
-                        val error = (result).exception.message ?: "An Error has occured"
-                        _uiState.value = HomeScreenUIEvents.Error(error)
+                        Log.d("HomeViewModel", "$${result}")
+                       return  emptyList()
                     }
                 }
 
             }
         }
-    }
+
 }
 
 
 
 sealed class HomeScreenUIEvents {
     data object Loading: HomeScreenUIEvents()
-    data class Success(val data: List<Product>) : HomeScreenUIEvents()
+    data class Success(val featured: List<Product> , val popularProducts: List<Product>) : HomeScreenUIEvents()
     data class Error(val message: String) : HomeScreenUIEvents()
 }
