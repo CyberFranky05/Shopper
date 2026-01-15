@@ -2,6 +2,7 @@ package com.piyush.shopper.ui.feature
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,11 +29,14 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,6 +51,26 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(navController: NavController, viewModel: HomeViewModel = koinViewModel()) {
     val uiState = viewModel.uiState.collectAsState()
 
+    val isLoading = remember {
+        mutableStateOf<Boolean>(false)
+    }
+
+    val errorMessage = remember {
+        mutableStateOf<String?>(null)
+    }
+
+    val feature = remember {
+        mutableStateOf<List<Product>>(emptyList())
+    }
+
+    val popular = remember {
+        mutableStateOf<List<Product>>(emptyList())
+    }
+
+    val categories = remember {
+        mutableStateOf<List<String>>(emptyList())
+    }
+
     Scaffold {
         Surface(
             modifier = Modifier
@@ -55,18 +79,33 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = koinView
         ) {
             when (uiState.value) {
                 is HomeScreenUIEvents.Loading -> {
-                    CircularProgressIndicator()
+                    isLoading.value = true
+                    errorMessage.value = null
                 }
 
                 is HomeScreenUIEvents.Success -> {
                     val data = (uiState.value as HomeScreenUIEvents.Success)
-                    HomeContent(data.featured, data.popularProducts)
+                    isLoading.value = false
+                    errorMessage.value = null
+                    feature.value = data.featured
+                    popular.value = data.popularProducts
+                    categories.value = data.categories
                 }
 
                 is HomeScreenUIEvents.Error -> {
-                    Text(text = (uiState.value as HomeScreenUIEvents.Error).message)
+                    val data = (uiState.value as HomeScreenUIEvents.Error)
+                    isLoading.value = false
+                    errorMessage.value = data.message
                 }
             }
+
+            HomeContent(
+                featured = feature.value,
+                popularProducts = popular.value,
+                categories = categories.value,
+                isLoading = isLoading.value,
+                errorMessage = errorMessage.value
+            )
         }
     }
 }
@@ -114,7 +153,13 @@ fun ProfileHeader() {
 }
 
 @Composable
-fun HomeContent(featured: List<Product>, popularProducts: List<Product>) {
+fun HomeContent(
+    featured: List<Product>,
+    popularProducts: List<Product> ,
+    categories: List<String>,
+    isLoading : Boolean = false,
+    errorMessage : String? = null
+) {
     LazyColumn {
         item {
             ProfileHeader()
@@ -123,6 +168,53 @@ fun HomeContent(featured: List<Product>, popularProducts: List<Product>) {
             Spacer(modifier = Modifier.size(16.dp))
         }
         item {
+
+            if(isLoading){
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(50.dp))
+                    Text(
+                        text = "Loading products...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 48.dp)
+                    )
+                }
+            }
+
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Red,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+
+            if(categories.isNotEmpty()){
+                LazyRow{
+                    items(categories) {
+                        category ->
+                        Text(
+                            text = category.replaceFirstChar { it.uppercase() },
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.primary)
+                                .padding(8.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.size(16.dp))
+            }
             if (featured.isNotEmpty()) {
                 HomeProductRow(products = featured, title = "Featured")
                 Spacer(modifier = Modifier.size(16.dp))

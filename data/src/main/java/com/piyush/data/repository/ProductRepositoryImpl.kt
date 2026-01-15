@@ -9,4 +9,5 @@ class ProductRepositoryImpl (val networkService: NetworkService): ProductReposit
     override suspend fun getProducts(category:String?): ResultWrapper<List<Product>> {
         return networkService.getProducts(category)
     }
+
 }

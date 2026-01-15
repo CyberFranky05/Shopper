@@ -11,7 +11,6 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.header
 import io.ktor.client.request.request
-import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.Parameters
@@ -36,6 +35,14 @@ class NetworkServiceImpl(val client: HttpClient) : NetworkService {
         )
         Log.d("NetworkServiceImpl", "Fetched products for category $category: $output")
         return  output
+    }
+
+    override suspend fun getCategories(): ResultWrapper<List<String>> {
+        val url = "$baseUrl/products/categories"
+        return makeWebRequest<List<String> , List<String>>(
+            url = url,
+            method = HttpMethod.Get
+        )
     }
 
     @OptIn(InternalAPI::class)
