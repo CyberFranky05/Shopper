@@ -1,11 +1,12 @@
 package com.piyush.domain.network
 
-import com.piyush.domain.model.Product
+import com.piyush.domain.model.response.CategoryResponse
+import com.piyush.domain.model.response.ProductResponse
 
 interface NetworkService{
-    suspend fun getProducts(category: String?): ResultWrapper<List<Product>>
+    suspend fun getProducts(category: Int?): ResultWrapper<ProductResponse>
 
-    suspend fun getCategories(): ResultWrapper<List<String>>
+    suspend fun getCategories(): ResultWrapper<CategoryResponse>
 }
 
 

@@ -3,6 +3,8 @@ package com.piyush.data.network
 import android.util.Log
 import com.piyush.data.model.DataProductModel
 import com.piyush.domain.model.Product
+import com.piyush.domain.model.response.CategoryResponse
+import com.piyush.domain.model.response.ProductResponse
 import com.piyush.domain.network.NetworkService
 import com.piyush.domain.network.ResultWrapper
 import io.ktor.client.HttpClient
@@ -20,26 +22,24 @@ import kotlinx.io.IOException
 
 
 class NetworkServiceImpl(val client: HttpClient) : NetworkService {
-    private val baseUrl = "https://fakestoreapi.com"
-    override suspend fun getProducts(category: String?): ResultWrapper<List<Product>> {
+    private val baseUrl = "https://ecommerce-ktor-4641e7ff1b63.herokuapp.com"
+    override suspend fun getProducts(category: Int?): ResultWrapper<ProductResponse>{
         val url =
         if (category != null) "$baseUrl/products/category/$category" else "$baseUrl/products"
 
 
-        val output =  makeWebRequest(
+        val output =  makeWebRequest<ProductResponse , ProductResponse>(
             url = url,
             method = HttpMethod.Get,
-            mapper = { dataModels: List<DataProductModel> ->
-                dataModels.map { it.toProduct() }
-            }
+
         )
         Log.d("NetworkServiceImpl", "Fetched products for category $category: $output")
         return  output
     }
 
-    override suspend fun getCategories(): ResultWrapper<List<String>> {
-        val url = "$baseUrl/products/categories"
-        return makeWebRequest<List<String> , List<String>>(
+    override suspend fun getCategories(): ResultWrapper<CategoryResponse> {
+        val url = "$baseUrl/categories"
+        return makeWebRequest<CategoryResponse, CategoryResponse>(
             url = url,
             method = HttpMethod.Get
         )
