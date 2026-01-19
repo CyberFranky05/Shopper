@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DataProductModel (
-    val id : Long,
+    val id : Int,
     val title: String,
     val price: Double,
     val categoryId: Int?,

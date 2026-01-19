@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version "2.2.0"
+    id("kotlin-parcelize")
+
 }
 
 android {
@@ -67,6 +70,9 @@ dependencies {
     implementation(libs.coil.compose)
 
     implementation(libs.androidx.animation)
+
+    implementation(libs.ktor.serialization.kotlinx.json)
+
 
 
 }

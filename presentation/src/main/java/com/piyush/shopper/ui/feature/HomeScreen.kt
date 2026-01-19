@@ -6,6 +6,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,33 +52,31 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.piyush.domain.model.Product
+import com.piyush.shopper.Navigation.ProductDetails
 import com.piyush.shopper.R
+import com.piyush.shopper.model.UiProductModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HomeViewModel = koinViewModel()) {
     val uiState = viewModel.uiState.collectAsState()
-
-    val isLoading = remember {
-        mutableStateOf<Boolean>(false)
+    val loading = remember {
+        mutableStateOf(false)
     }
-
-    val errorMessage = remember {
+    val error = remember {
         mutableStateOf<String?>(null)
     }
-
     val feature = remember {
         mutableStateOf<List<Product>>(emptyList())
-    }
 
+    }
     val popular = remember {
         mutableStateOf<List<Product>>(emptyList())
-    }
 
+    }
     val categories = remember {
         mutableStateOf<List<String>>(emptyList())
     }
-
     Scaffold {
         Surface(
             modifier = Modifier
@@ -86,32 +85,29 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = koinView
         ) {
             when (uiState.value) {
                 is HomeScreenUIEvents.Loading -> {
-                    isLoading.value = true
-                    errorMessage.value = null
+                    loading.value = true
+                    error.value = null
                 }
 
                 is HomeScreenUIEvents.Success -> {
                     val data = (uiState.value as HomeScreenUIEvents.Success)
-                    isLoading.value = false
-                    errorMessage.value = null
                     feature.value = data.featured
                     popular.value = data.popularProducts
                     categories.value = data.categories
+                    loading.value = false
+                    error.value = null
                 }
 
                 is HomeScreenUIEvents.Error -> {
-                    val data = (uiState.value as HomeScreenUIEvents.Error)
-                    isLoading.value = false
-                    errorMessage.value = data.message
+                    val errorMsg = (uiState.value as HomeScreenUIEvents.Error).message
+                    loading.value = false
+                    error.value = errorMsg
                 }
             }
-
             HomeContent(
-                featured = feature.value,
-                popularProducts = popular.value,
-                categories = categories.value,
-                isLoading = isLoading.value,
-                errorMessage = errorMessage.value
+                feature.value, popular.value, categories.value, loading.value, error.value, onClick = {
+                    navController.navigate(ProductDetails(UiProductModel.fromProduct(it)))
+                }
             )
         }
     }
@@ -162,10 +158,11 @@ fun ProfileHeader() {
 @Composable
 fun HomeContent(
     featured: List<Product>,
-    popularProducts: List<Product> ,
+    popularProducts: List<Product>,
     categories: List<String>,
-    isLoading : Boolean = false,
-    errorMessage : String? = null
+    isLoading: Boolean = false,
+    errorMsg: String? = null,
+    onClick: (Product) -> Unit
 ) {
     LazyColumn {
         item {
@@ -175,46 +172,31 @@ fun HomeContent(
             Spacer(modifier = Modifier.size(16.dp))
         }
         item {
-
-            if(isLoading){
+            if (isLoading) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     CircularProgressIndicator(modifier = Modifier.size(50.dp))
-                    Text(
-                        text = "Loading products...",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(top = 48.dp)
-                    )
+                    Text(text = "Loading...", style = MaterialTheme.typography.bodyMedium)
                 }
             }
-
-            errorMessage?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Red,
-                    modifier = Modifier.padding(16.dp)
-                )
+            errorMsg?.let {
+                Text(text = it, style = MaterialTheme.typography.bodyMedium)
             }
-
-
-            if(categories.isNotEmpty()){
-                LazyRow{
-                    items(categories , key = {it}) {
-                        category ->
-                        var isVisible by remember {
+            if (categories.isNotEmpty()) {
+                LazyRow {
+                    items(categories, key = { it }) { category ->
+                        val isVisible = remember {
                             mutableStateOf(false)
                         }
-
                         LaunchedEffect(true) {
-                            isVisible = true
+                            isVisible.value = true
                         }
-
-                        AnimatedVisibility(visible = isVisible , enter = fadeIn() + expandHorizontally()) {
+                        AnimatedVisibility(
+                            visible = isVisible.value, enter = fadeIn() + expandVertically()
+                        ) {
                             Text(
                                 text = category.replaceFirstChar { it.uppercase() },
                                 style = MaterialTheme.typography.bodyMedium,
@@ -228,16 +210,20 @@ fun HomeContent(
                             )
                         }
                     }
-                }
 
+                }
                 Spacer(modifier = Modifier.size(16.dp))
             }
             if (featured.isNotEmpty()) {
-                HomeProductRow(products = featured, title = "Featured")
+                HomeProductRow(products = featured, title = "Featured", onClick = onClick)
                 Spacer(modifier = Modifier.size(16.dp))
             }
             if (popularProducts.isNotEmpty()) {
-                HomeProductRow(products = popularProducts, title = "Popular Products")
+                HomeProductRow(
+                    products = popularProducts,
+                    title = "Popular Products",
+                    onClick = onClick
+                )
             }
         }
     }
@@ -246,8 +232,7 @@ fun HomeContent(
 @Composable
 fun SearchBar(value: String, onTextChanged: (String) -> Unit) {
 
-    TextField(
-        value = value,
+    TextField(value = value,
         onValueChange = onTextChanged,
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -268,16 +253,14 @@ fun SearchBar(value: String, onTextChanged: (String) -> Unit) {
         ),
         placeholder = {
             Text(
-                text = "Search for products",
-                style = MaterialTheme.typography.bodySmall
+                text = "Search for products", style = MaterialTheme.typography.bodySmall
             )
-        }
-    )
+        })
 
 }
 
 @Composable
-fun HomeProductRow(products: List<Product>, title: String) {
+fun HomeProductRow(products: List<Product>, title: String, onClick: (Product) -> Unit) {
     Column {
         Box(
             modifier = Modifier
@@ -303,20 +286,17 @@ fun HomeProductRow(products: List<Product>, title: String) {
         }
         Spacer(modifier = Modifier.size(8.dp))
         LazyRow {
-            items(products , key = {it.id}) { product ->
-                var isVisible by remember {
+            items(products, key = { it.id }) { product ->
+                val isVisible = remember {
                     mutableStateOf(false)
                 }
-
                 LaunchedEffect(true) {
-                    isVisible = true
+                    isVisible.value = true
                 }
-
-                AnimatedVisibility(
-                    enter = fadeIn() + expandVertically(),
-                    visible = isVisible
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = isVisible.value, enter = fadeIn() + expandVertically()
                 ) {
-                    ProductItem(product = product)
+                    ProductItem(product = product, onClick)
                 }
             }
         }
@@ -325,11 +305,12 @@ fun HomeProductRow(products: List<Product>, title: String) {
 
 
 @Composable
-fun ProductItem(product: Product) {
+fun ProductItem(product: Product, onClick: (Product) -> Unit) {
     Card(
         modifier = Modifier
             .padding(horizontal = 8.dp)
-            .size(width = 126.dp, height = 144.dp),
+            .size(width = 126.dp, height = 144.dp)
+            .clickable { onClick(product) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(alpha = 0.3f))
     ) {
@@ -360,4 +341,3 @@ fun ProductItem(product: Product) {
         }
     }
 }
-
