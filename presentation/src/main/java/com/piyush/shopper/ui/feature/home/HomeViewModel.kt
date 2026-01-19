@@ -1,9 +1,8 @@
-package com.piyush.shopper.ui.feature
+package com.piyush.shopper.ui.feature.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.piyush.domain.model.Product
 import com.piyush.domain.network.ResultWrapper
 import com.piyush.domain.usecase.GetCategoryUsecase

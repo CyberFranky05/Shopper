@@ -4,11 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -17,6 +18,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -33,7 +36,8 @@ import com.piyush.shopper.Navigation.ProductDetails
 import com.piyush.shopper.Navigation.ProfileScreen
 import com.piyush.shopper.Navigation.productNavType
 import com.piyush.shopper.model.UiProductModel
-import com.piyush.shopper.ui.feature.HomeScreen
+import com.piyush.shopper.ui.feature.home.HomeScreen
+import com.piyush.shopper.ui.feature.product_details.ProductDetailsScreen
 import com.piyush.shopper.ui.theme.ShopperTheme
 import kotlin.reflect.typeOf
 
@@ -43,11 +47,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ShopperTheme {
+                val shouldShowBottomNav = remember{
+                    mutableStateOf(true)
+                }
                 val navController = rememberNavController()
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        BottomNavigationBar(navController)
+                        AnimatedVisibility(visible =shouldShowBottomNav.value , enter = fadeIn()) {
+                            BottomNavigationBar(navController)
+                        }
                     }
                 ) {
                     Surface(
@@ -58,25 +67,32 @@ class MainActivity : ComponentActivity() {
                         NavHost(navController = navController, startDestination = HomeScreen) {
                             composable<HomeScreen> {
                                 HomeScreen(navController)
+                                shouldShowBottomNav.value = true
                             }
                             composable<CartScreen> {
                                 Box(modifier = Modifier.fillMaxSize()) {
                                     Text(text = "Cart")
                                 }
+                                shouldShowBottomNav.value = true
+
                             }
                             composable<ProfileScreen> {
                                 Box(modifier = Modifier.fillMaxSize()) {
                                     Text(text = "Profile")
                                 }
+                                shouldShowBottomNav.value = true
+
                             }
 
                             composable<ProductDetails>(
                                 typeMap = mapOf(typeOf<UiProductModel>() to productNavType)
                             ) {
                                 val productRoute = it.toRoute<ProductDetails>()
-                                Box(modifier = Modifier.fillMaxSize()) {
-                                    Text(text = productRoute.product.title)
-                                }
+                                ProductDetailsScreen(
+                                    navController,productRoute.product
+                                )
+                                shouldShowBottomNav.value = false
+
                             }
                         }
                     }

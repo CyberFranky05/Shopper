@@ -1,7 +1,6 @@
-package com.piyush.shopper.ui.feature
+package com.piyush.shopper.ui.feature.home
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
@@ -35,16 +34,13 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -293,7 +289,7 @@ fun HomeProductRow(products: List<Product>, title: String, onClick: (Product) ->
                 LaunchedEffect(true) {
                     isVisible.value = true
                 }
-                androidx.compose.animation.AnimatedVisibility(
+                AnimatedVisibility(
                     visible = isVisible.value, enter = fadeIn() + expandVertically()
                 ) {
                     ProductItem(product = product, onClick)

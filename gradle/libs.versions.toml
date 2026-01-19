@@ -16,6 +16,8 @@ koin = "4.1.1"
 ktor = "3.3.3"
 navigationCompose = "2.9.6"
 animation = "1.10.1"
+foundation = "1.10.1"
+material3 = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -52,6 +54,8 @@ ktor-serialization-kotlinx-json = {module = "io.ktor:ktor-serialization-kotlinx-
 
 compose-navigation = {module="androidx.navigation:navigation-compose" , version.ref = "navigationCompose"}
 androidx-animation = {module ="androidx.compose.animation:animation" , version.ref = "animation" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
