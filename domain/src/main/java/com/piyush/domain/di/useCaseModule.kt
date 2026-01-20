@@ -1,0 +1,19 @@
+package com.piyush.domain.di
+
+import androidx.lifecycle.ViewModelProvider
+import com.piyush.domain.usecase.AddToCartUseCase
+import com.piyush.domain.usecase.GetCartUseCase
+import com.piyush.domain.usecase.GetCategoryUsecase
+import com.piyush.domain.usecase.GetProductUseCase
+import org.koin.dsl.module
+
+val useCaseModule = module {
+
+    factory { GetProductUseCase(get()) }
+    factory { GetCategoryUsecase(get ()) }
+    factory { AddToCartUseCase(get()) }
+    factory { GetCartUseCase(get ()) }
+
+
+
+}

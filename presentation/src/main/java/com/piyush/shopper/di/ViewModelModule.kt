@@ -1,6 +1,7 @@
 package com.piyush.shopper.di
 
 
+import com.piyush.shopper.ui.feature.cart.CartViewModel
 import com.piyush.shopper.ui.feature.home.HomeViewModel
 import com.piyush.shopper.ui.feature.product_details.ProductDetailsViewModel
 import org.koin.core.module.dsl.viewModel
@@ -15,7 +16,10 @@ val viewModelModule = module {
     }
 
     viewModel {
-        ProductDetailsViewModel()
+        ProductDetailsViewModel(get())
+    }
 
+    viewModel {
+        CartViewModel(get())
     }
 }

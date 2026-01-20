@@ -36,6 +36,7 @@ import com.piyush.shopper.Navigation.ProductDetails
 import com.piyush.shopper.Navigation.ProfileScreen
 import com.piyush.shopper.Navigation.productNavType
 import com.piyush.shopper.model.UiProductModel
+import com.piyush.shopper.ui.feature.cart.CartScreen
 import com.piyush.shopper.ui.feature.home.HomeScreen
 import com.piyush.shopper.ui.feature.product_details.ProductDetailsScreen
 import com.piyush.shopper.ui.theme.ShopperTheme
@@ -70,11 +71,8 @@ class MainActivity : ComponentActivity() {
                                 shouldShowBottomNav.value = true
                             }
                             composable<CartScreen> {
-                                Box(modifier = Modifier.fillMaxSize()) {
-                                    Text(text = "Cart")
-                                }
                                 shouldShowBottomNav.value = true
-
+                                CartScreen(navController)
                             }
                             composable<ProfileScreen> {
                                 Box(modifier = Modifier.fillMaxSize()) {

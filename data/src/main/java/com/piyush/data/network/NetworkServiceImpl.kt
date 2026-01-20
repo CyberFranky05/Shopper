@@ -2,17 +2,23 @@ package com.piyush.data.network
 
 import android.util.Log
 import com.piyush.data.model.DataProductModel
+import com.piyush.data.model.request.AddToCartRequest
+import com.piyush.data.model.response.CartResponse
+import com.piyush.domain.model.CartModel
 import com.piyush.domain.model.Product
+import com.piyush.domain.model.request.AddCartRequestModel
 import com.piyush.domain.model.response.CategoryResponse
 import com.piyush.domain.model.response.ProductResponse
 import com.piyush.domain.network.NetworkService
 import com.piyush.domain.network.ResultWrapper
+import com.piyush.domain.usecase.AddToCartUseCase
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.header
 import io.ktor.client.request.request
+import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.Parameters
@@ -45,7 +51,30 @@ class NetworkServiceImpl(val client: HttpClient) : NetworkService {
         )
     }
 
-    @OptIn(InternalAPI::class)
+    override suspend fun addProductToCart(request: AddCartRequestModel): ResultWrapper<CartModel> {
+        val url = "$baseUrl/cart/1"
+        return makeWebRequest(url = url,
+                method = HttpMethod.Post,
+                body = AddToCartRequest.fromCartRequestModel(request),
+                mapper = { cartItem: CartResponse ->
+                    cartItem.toCartModel()
+                }
+            )
+    }
+
+    override suspend fun getCart(): ResultWrapper<CartModel> {
+        val url = "$baseUrl/cart/1"
+        return makeWebRequest(url = url,
+            method = HttpMethod.Get,
+            mapper = { cartItem: CartResponse ->
+                cartItem.toCartModel()
+            }
+        )
+    }
+
+
+
+
     suspend inline fun <reified T, R> makeWebRequest(
         url: String,
         method: HttpMethod,
@@ -71,7 +100,7 @@ class NetworkServiceImpl(val client: HttpClient) : NetworkService {
                 }
                 // Set body for POST, PUT, etc.
                 if (body != null) {
-                    this.body = body
+                    setBody(body)
                 }
 
                 // Set content type
