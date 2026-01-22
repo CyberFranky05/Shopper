@@ -41,6 +41,8 @@ import coil.compose.AsyncImage
 import com.piyush.domain.model.CartItemModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import com.piyush.domain.model.CartSummary
+import com.piyush.shopper.Navigation.CartSummaryScreen
 import com.piyush.shopper.R
 
 
@@ -104,12 +106,23 @@ fun CartScreen(navController: NavController, viewModel: CartViewModel = koinView
                 ) {
                     LazyColumn {
                         items(cartItems.value) { item ->
-                            CartItem(item = item)
+                            CartItem(
+                                item = item,
+                                onRemoveClick = {
+                                    viewModel.removeItem(it)
+                                },
+                                onIncreaseClick = {
+                                    viewModel.incrementQuantity(it)
+                                },
+                                onDecreaseClick = {
+                                    viewModel.decrementQuantity(it)
+                                }
+                            )
                         }
                     }
                 }
                 if(shouldShowList) {
-                    Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
+                    Button(onClick = { navController.navigate(CartSummaryScreen) }, modifier = Modifier.fillMaxWidth()) {
                         Text(text = "Checkout")
                     }
                 }
@@ -134,7 +147,12 @@ fun CartScreen(navController: NavController, viewModel: CartViewModel = koinView
 }
 
 @Composable
-fun CartItem(item: CartItemModel) {
+fun CartItem(
+    item: CartItemModel,
+    onRemoveClick: (CartItemModel) -> Unit = {},
+    onIncreaseClick: (CartItemModel) -> Unit = {},
+    onDecreaseClick: (CartItemModel) -> Unit = {}
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -168,20 +186,20 @@ fun CartItem(item: CartItemModel) {
         }
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.End) {
 
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { onRemoveClick(item)}) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_delete), contentDescription = null
                 )
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { onIncreaseClick(item) }) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_add), contentDescription = null
                     )
                 }
                 Text(text = item.quantity.toString())
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {onDecreaseClick(item) }) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_subtract),
                         contentDescription = null

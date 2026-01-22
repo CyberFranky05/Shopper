@@ -2,9 +2,12 @@ package com.piyush.domain.di
 
 import androidx.lifecycle.ViewModelProvider
 import com.piyush.domain.usecase.AddToCartUseCase
+import com.piyush.domain.usecase.CartSummaryUseCase
+import com.piyush.domain.usecase.DeleteProductUseCase
 import com.piyush.domain.usecase.GetCartUseCase
 import com.piyush.domain.usecase.GetCategoryUsecase
 import com.piyush.domain.usecase.GetProductUseCase
+import com.piyush.domain.usecase.UpdateQuantityUsecase
 import org.koin.dsl.module
 
 val useCaseModule = module {
@@ -13,7 +16,8 @@ val useCaseModule = module {
     factory { GetCategoryUsecase(get ()) }
     factory { AddToCartUseCase(get()) }
     factory { GetCartUseCase(get ()) }
-
-
+    factory { UpdateQuantityUsecase(get ()) }
+    factory { DeleteProductUseCase(get()) }
+    factory { CartSummaryUseCase(get ()) }
 
 }

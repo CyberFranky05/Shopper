@@ -31,11 +31,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.piyush.shopper.Navigation.CartScreen
+import com.piyush.shopper.Navigation.CartSummaryScreen
 import com.piyush.shopper.Navigation.HomeScreen
 import com.piyush.shopper.Navigation.ProductDetails
 import com.piyush.shopper.Navigation.ProfileScreen
 import com.piyush.shopper.Navigation.productNavType
 import com.piyush.shopper.model.UiProductModel
+import com.piyush.shopper.ui.feature.Summary.CartSummaryScreen
 import com.piyush.shopper.ui.feature.cart.CartScreen
 import com.piyush.shopper.ui.feature.home.HomeScreen
 import com.piyush.shopper.ui.feature.product_details.ProductDetailsScreen
@@ -80,6 +82,11 @@ class MainActivity : ComponentActivity() {
                                 }
                                 shouldShowBottomNav.value = true
 
+                            }
+
+                            composable<CartSummaryScreen> {
+                                shouldShowBottomNav.value = false
+                                CartSummaryScreen(navController = navController)
                             }
 
                             composable<ProductDetails>(

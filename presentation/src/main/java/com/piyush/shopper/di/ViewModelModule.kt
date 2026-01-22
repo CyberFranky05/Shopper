@@ -1,6 +1,7 @@
 package com.piyush.shopper.di
 
 
+import com.piyush.shopper.ui.feature.Summary.CartSummaryViewModel
 import com.piyush.shopper.ui.feature.cart.CartViewModel
 import com.piyush.shopper.ui.feature.home.HomeViewModel
 import com.piyush.shopper.ui.feature.product_details.ProductDetailsViewModel
@@ -16,10 +17,22 @@ val viewModelModule = module {
     }
 
     viewModel {
-        ProductDetailsViewModel(get())
+        ProductDetailsViewModel(
+            get()
+        )
     }
 
     viewModel {
-        CartViewModel(get())
+        CartViewModel(
+            get(),
+            get(),
+            get()
+        )
+    }
+
+    viewModel {
+        CartSummaryViewModel(
+            get()
+        )
     }
 }

@@ -75,6 +75,9 @@ fun ProductDetailsScreen(
                     .background(Color.LightGray.copy(alpha = 0.4f))
                     .padding(8.dp)
                     .align(Alignment.TopStart)
+                    .clickable(
+                        onClick = {navController.popBackStack()}
+                    )
             )
 
             Image(
