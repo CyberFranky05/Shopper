@@ -33,14 +33,20 @@ import androidx.navigation.toRoute
 import com.piyush.shopper.Navigation.CartScreen
 import com.piyush.shopper.Navigation.CartSummaryScreen
 import com.piyush.shopper.Navigation.HomeScreen
+import com.piyush.shopper.Navigation.OrdersScreen
 import com.piyush.shopper.Navigation.ProductDetails
 import com.piyush.shopper.Navigation.ProfileScreen
+import com.piyush.shopper.Navigation.UserAddressRoute
+import com.piyush.shopper.Navigation.UserAddressRouteWrapper
 import com.piyush.shopper.Navigation.productNavType
+import com.piyush.shopper.Navigation.userAddressNavType
 import com.piyush.shopper.model.UiProductModel
 import com.piyush.shopper.ui.feature.Summary.CartSummaryScreen
 import com.piyush.shopper.ui.feature.cart.CartScreen
 import com.piyush.shopper.ui.feature.home.HomeScreen
+import com.piyush.shopper.ui.feature.orders.OrdersScreen
 import com.piyush.shopper.ui.feature.product_details.ProductDetailsScreen
+import com.piyush.shopper.ui.feature.user_address.UserAddressScreen
 import com.piyush.shopper.ui.theme.ShopperTheme
 import kotlin.reflect.typeOf
 
@@ -50,16 +56,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ShopperTheme {
-                val shouldShowBottomNav = remember{
+                val shouldShowBottomNav = remember {
                     mutableStateOf(true)
                 }
                 val navController = rememberNavController()
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        AnimatedVisibility(visible =shouldShowBottomNav.value , enter = fadeIn()) {
+                        AnimatedVisibility(visible = shouldShowBottomNav.value, enter = fadeIn()) {
                             BottomNavigationBar(navController)
                         }
+
                     }
                 ) {
                     Surface(
@@ -76,33 +83,40 @@ class MainActivity : ComponentActivity() {
                                 shouldShowBottomNav.value = true
                                 CartScreen(navController)
                             }
+                            composable<OrdersScreen> {
+                                shouldShowBottomNav.value = true
+                                OrdersScreen()
+                            }
                             composable<ProfileScreen> {
+                                shouldShowBottomNav.value = true
                                 Box(modifier = Modifier.fillMaxSize()) {
                                     Text(text = "Profile")
                                 }
-                                shouldShowBottomNav.value = true
-
                             }
-
                             composable<CartSummaryScreen> {
                                 shouldShowBottomNav.value = false
                                 CartSummaryScreen(navController = navController)
                             }
-
                             composable<ProductDetails>(
                                 typeMap = mapOf(typeOf<UiProductModel>() to productNavType)
                             ) {
-                                val productRoute = it.toRoute<ProductDetails>()
-                                ProductDetailsScreen(
-                                    navController,productRoute.product
-                                )
                                 shouldShowBottomNav.value = false
-
+                                val productRoute = it.toRoute<ProductDetails>()
+                                ProductDetailsScreen(navController, productRoute.product)
+                            }
+                            composable<UserAddressRoute>(
+                                typeMap = mapOf(typeOf<UserAddressRouteWrapper>() to userAddressNavType)
+                            ) {
+                                shouldShowBottomNav.value = false
+                                val userAddressRoute = it.toRoute<UserAddressRoute>()
+                                UserAddressScreen(
+                                    navController = navController,
+                                    userAddress = userAddressRoute.userAddressWrapper.userAddress
+                                )
                             }
                         }
                     }
                 }
-
             }
         }
     }
@@ -115,7 +129,7 @@ fun BottomNavigationBar(navController: NavController) {
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
         val items = listOf(
             BottomNavItems.Home,
-            BottomNavItems.Cart,
+            BottomNavItems.Orders,
             BottomNavItems.Profile
         )
 
@@ -154,6 +168,6 @@ fun BottomNavigationBar(navController: NavController) {
 
 sealed class BottomNavItems(val route: Any, val title: String, val icon: Int) {
     object Home : BottomNavItems(HomeScreen, "Home", icon = R.drawable.ic_home)
-    object Cart : BottomNavItems(CartScreen, "Cart", icon = R.drawable.ic_cart)
+    object Orders : BottomNavItems(OrdersScreen, "Orders", icon = R.drawable.ic_orders)
     object Profile : BottomNavItems(ProfileScreen, "Profile", icon = R.drawable.ic_profile_bn)
 }

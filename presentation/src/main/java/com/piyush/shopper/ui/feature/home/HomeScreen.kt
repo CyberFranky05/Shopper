@@ -289,7 +289,7 @@ fun HomeProductRow(products: List<Product>, title: String, onClick: (Product) ->
                 LaunchedEffect(true) {
                     isVisible.value = true
                 }
-                AnimatedVisibility(
+                androidx.compose.animation.AnimatedVisibility(
                     visible = isVisible.value, enter = fadeIn() + expandVertically()
                 ) {
                     ProductItem(product = product, onClick)

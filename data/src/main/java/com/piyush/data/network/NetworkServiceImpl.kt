@@ -3,11 +3,16 @@ package com.piyush.data.network
 import android.util.Log
 import com.piyush.data.model.DataProductModel
 import com.piyush.data.model.request.AddToCartRequest
+import com.piyush.data.model.request.AddressDataModel
 import com.piyush.data.model.response.CartResponse
 import com.piyush.data.model.response.CartSummaryResponse
+import com.piyush.data.model.response.OrdersListResponse
+import com.piyush.data.model.response.PlaceOrderResponse
+import com.piyush.domain.model.AddressDomainModel
 import com.piyush.domain.model.CartItemModel
 import com.piyush.domain.model.CartModel
 import com.piyush.domain.model.CartSummary
+import com.piyush.domain.model.OrdersListModel
 import com.piyush.domain.model.Product
 import com.piyush.domain.model.request.AddCartRequestModel
 import com.piyush.domain.model.response.CategoryResponse
@@ -113,6 +118,26 @@ class NetworkServiceImpl(val client: HttpClient) : NetworkService {
             }
         )
 
+    }
+
+    override suspend fun placeOrder(address: AddressDomainModel, userId: Int): ResultWrapper<Long> {
+        val dataModel = AddressDataModel.fromDomainAddress(address)
+        val url = "$baseUrl/orders/$userId"
+        return makeWebRequest(url = url,
+            method = HttpMethod.Post,
+            body = dataModel,
+            mapper = { orderRes: PlaceOrderResponse ->
+                orderRes.data.id
+            })
+    }
+
+    override suspend fun getOrderList(): ResultWrapper<OrdersListModel> {
+        val url = "$baseUrl/orders/1"
+        return makeWebRequest(url = url,
+            method = HttpMethod.Get,
+            mapper = { ordersResponse: OrdersListResponse ->
+                ordersResponse.toDomainResponse()
+            })
     }
 
 

@@ -8,11 +8,16 @@ import com.piyush.data.model.Summary
 import com.piyush.domain.model.CartSummary
 import com.piyush.domain.network.ResultWrapper
 import com.piyush.domain.usecase.CartSummaryUseCase
+import com.piyush.domain.usecase.PlaceOrderUsecase
+import com.piyush.shopper.model.UserAddress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CartSummaryViewModel (private val cartSummaryUseCase: CartSummaryUseCase): ViewModel() {
+class CartSummaryViewModel(
+    private val cartSummaryUseCase: CartSummaryUseCase,
+    private val placeOrderUseCase: PlaceOrderUsecase
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CartSummaryEvent>(CartSummaryEvent.Loading)
     val uiState = _uiState.asStateFlow()
@@ -22,35 +27,42 @@ class CartSummaryViewModel (private val cartSummaryUseCase: CartSummaryUseCase):
     }
 
     private fun getCartSummary(userId: Int) {
-
-        viewModelScope.launch  {
+        viewModelScope.launch {
             _uiState.value = CartSummaryEvent.Loading
-            val Summary = cartSummaryUseCase.execute(userId)
-
-            when(Summary){
+            val summary = cartSummaryUseCase.execute(userId)
+            when (summary) {
                 is ResultWrapper.Success -> {
-                    _uiState.value = CartSummaryEvent.Success(Summary.value)
-
+                    _uiState.value = CartSummaryEvent.Success(summary.value)
                 }
 
-                is ResultWrapper.Failure -> {
-                    _uiState.value = CartSummaryEvent.Error("Something Went Wrong!")
-                    Log.d("TAG", "getCartSummary: ${Summary}")
+               is ResultWrapper.Failure -> {
+                    _uiState.value = CartSummaryEvent.Error("Something went wrong!")
                 }
             }
         }
-
-
     }
 
+    public fun placeOrder(userAddress: UserAddress) {
+        viewModelScope.launch {
+            _uiState.value = CartSummaryEvent.Loading
+            val orderId = placeOrderUseCase.execute(userAddress.toAddressDataModel())
+            when (orderId) {
+                is ResultWrapper.Success -> {
+                    _uiState.value = CartSummaryEvent.PlaceOrder(orderId.value)
+                }
 
-
+                is ResultWrapper.Failure -> {
+                    Log.d("CartSummary", "Error: ${orderId}")
+                    _uiState.value = CartSummaryEvent.Error("Something went wrong!")
+                }
+            }
+        }
+    }
 }
 
-
-
 sealed class CartSummaryEvent {
-    data object Loading: CartSummaryEvent()
-    data class Success(val cartSummary: CartSummary): CartSummaryEvent()
-    data class Error(val message: String): CartSummaryEvent()
+    data object Loading : CartSummaryEvent()
+    data class Error(val error: String) : CartSummaryEvent()
+    data class Success(val summary: CartSummary) : CartSummaryEvent()
+    data class PlaceOrder(val orderId: Long) : CartSummaryEvent()
 }
