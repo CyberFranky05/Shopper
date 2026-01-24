@@ -11,7 +11,7 @@ class OrderRepositoryImpl(private val networkService: NetworkService) : OrderRep
         return networkService.placeOrder(addressDomainModel, 1)
     }
 
-    override suspend fun getOrderList(): ResultWrapper<OrdersListModel> {
-        return networkService.getOrderList()
+    override suspend fun getOrderList(userId: Long): ResultWrapper<OrdersListModel> {
+        return networkService.getOrderList(userId)
     }
 }

@@ -8,6 +8,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 object HomeScreen
 
+
+@Serializable
+object LoginScreen
+
+@Serializable
+object RegisterScreen
+
+
+
 @Serializable
 object CartScreen
 

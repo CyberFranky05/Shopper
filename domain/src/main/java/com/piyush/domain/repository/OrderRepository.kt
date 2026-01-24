@@ -6,5 +6,5 @@ import com.piyush.domain.network.ResultWrapper
 
 interface OrderRepository {
     suspend fun placeOrder(addressDomainModel: AddressDomainModel): ResultWrapper<Long>
-    suspend fun getOrderList(): ResultWrapper<OrdersListModel>
+    suspend fun getOrderList(userId: Long): ResultWrapper<OrdersListModel>
 }

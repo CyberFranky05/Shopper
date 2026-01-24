@@ -7,8 +7,10 @@ import com.piyush.domain.usecase.DeleteProductUseCase
 import com.piyush.domain.usecase.GetCartUseCase
 import com.piyush.domain.usecase.GetCategoryUsecase
 import com.piyush.domain.usecase.GetProductUseCase
+import com.piyush.domain.usecase.LoginUsecase
 import com.piyush.domain.usecase.OrderListUseCase
 import com.piyush.domain.usecase.PlaceOrderUsecase
+import com.piyush.domain.usecase.RegisterUseCase
 import com.piyush.domain.usecase.UpdateQuantityUsecase
 import org.koin.dsl.module
 
@@ -23,5 +25,7 @@ val useCaseModule = module {
     factory { CartSummaryUseCase(get ()) }
     factory { PlaceOrderUsecase(get()) }
     factory { OrderListUseCase(get()) }
+    factory { LoginUsecase(get()) }
+    factory { RegisterUseCase(get()) }
 
 }

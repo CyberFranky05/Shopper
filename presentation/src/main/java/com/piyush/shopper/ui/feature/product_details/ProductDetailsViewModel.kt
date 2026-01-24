@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.piyush.domain.model.request.AddCartRequestModel
 import com.piyush.domain.network.ResultWrapper
 import com.piyush.domain.usecase.AddToCartUseCase
+import com.piyush.shopper.ShopperSession
 import com.piyush.shopper.model.UiProductModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,17 +19,21 @@ class ProductDetailsViewModel (val usecase : AddToCartUseCase): ViewModel(){
     private val _state = MutableStateFlow<ProductDetailEvent>(ProductDetailEvent.Nothing)
     val state = _state.asStateFlow()
 
+    val userDomainModel  = ShopperSession.getUser()
 
     fun addProductToCart(product: UiProductModel){
         viewModelScope.launch {
             _state.value = ProductDetailEvent.Loading
-            val result = usecase.execute(AddCartRequestModel(
-                productId = product.id,
-                productName = product.title,
-                price = product.price,
-                quantity = 1,
-                userId = 1
-            ) )
+            val result = usecase.execute(
+                AddCartRequestModel(
+                    product.id,
+                    product.title,
+                    product.price,
+                    1,
+                    userDomainModel!!.id!!
+                ),
+                userDomainModel.id!!.toLong()
+            )
             when(result){
                 is ResultWrapper.Success -> {
                     _state.value = ProductDetailEvent.Success("Product added to Cart")

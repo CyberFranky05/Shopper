@@ -9,6 +9,7 @@ import com.piyush.domain.model.CartSummary
 import com.piyush.domain.network.ResultWrapper
 import com.piyush.domain.usecase.CartSummaryUseCase
 import com.piyush.domain.usecase.PlaceOrderUsecase
+import com.piyush.shopper.ShopperSession
 import com.piyush.shopper.model.UserAddress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,12 +22,14 @@ class CartSummaryViewModel(
 
     private val _uiState = MutableStateFlow<CartSummaryEvent>(CartSummaryEvent.Loading)
     val uiState = _uiState.asStateFlow()
+    val userDomainModel  = ShopperSession.getUser()
+
 
     init {
-        getCartSummary(1)
+        getCartSummary(userDomainModel!!.id!!.toLong())
     }
 
-    private fun getCartSummary(userId: Int) {
+    private fun getCartSummary(userId: Long) {
         viewModelScope.launch {
             _uiState.value = CartSummaryEvent.Loading
             val summary = cartSummaryUseCase.execute(userId)

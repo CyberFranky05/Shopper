@@ -7,6 +7,7 @@ import com.piyush.domain.network.ResultWrapper
 import com.piyush.domain.usecase.DeleteProductUseCase
 import com.piyush.domain.usecase.GetCartUseCase
 import com.piyush.domain.usecase.UpdateQuantityUsecase
+import com.piyush.shopper.ShopperSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -19,6 +20,8 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<CartEvent>(CartEvent.Loading)
     val uiState = _uiState.asStateFlow()
+    val userDomainModel  = ShopperSession.getUser()
+
 
     init {
         getCart()
@@ -27,7 +30,7 @@ class CartViewModel(
     fun getCart() {
         viewModelScope.launch {
             _uiState.value = CartEvent.Loading
-            cartUseCase.execute().let { result ->
+            cartUseCase.execute(userDomainModel!!.id!!.toLong()).let { result ->
                 when (result) {
                     is ResultWrapper.Success -> {
                         _uiState.value = CartEvent.Success(result.value.data)
@@ -40,6 +43,7 @@ class CartViewModel(
             }
         }
     }
+
 
     fun incrementQuantity(cartItem: CartItemModel) {
         if(cartItem.quantity==10) return
@@ -54,7 +58,7 @@ class CartViewModel(
     private fun updateQuantity(cartItem: CartItemModel) {
         viewModelScope.launch {
             _uiState.value = CartEvent.Loading
-            val result = updateQuantityUseCase.execute(cartItem)
+            val result = updateQuantityUseCase.execute(cartItem,userDomainModel!!.id!!.toLong())
             when (result) {
                 is ResultWrapper.Success -> {
                     _uiState.value = CartEvent.Success(result.value.data)
