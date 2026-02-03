@@ -15,8 +15,6 @@ object LoginScreen
 @Serializable
 object RegisterScreen
 
-
-
 @Serializable
 object CartScreen
 

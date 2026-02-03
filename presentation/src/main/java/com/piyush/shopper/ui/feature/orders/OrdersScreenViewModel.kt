@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class OrdersViewModel(
-    private val orderListUseCase: OrderListUseCase
+    private val orderListUseCase: OrderListUseCase,
+    private val ShopperSession: ShopperSession
 ) : ViewModel() {
 
     private val _ordersEvent = MutableStateFlow<OrdersEvent>(OrdersEvent.Loading)

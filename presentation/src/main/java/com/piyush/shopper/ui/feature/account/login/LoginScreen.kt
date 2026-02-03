@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.piyush.shopper.Navigation.HomeScreen
+import com.piyush.shopper.Navigation.RegisterScreen
 import com.piyush.shopper.R
 import org.koin.androidx.compose.koinViewModel
 

@@ -5,8 +5,8 @@ import com.piyush.domain.model.UserDomainModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-object ShopperSession : KoinComponent {
-    private val context: Context by inject()
+class ShopperSession (
+    private val context: Context) {
 
 
     fun storeUser(user: UserDomainModel){
@@ -36,5 +36,12 @@ object ShopperSession : KoinComponent {
 
     }
 
-
+    fun deleteUser() {
+        val sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            clear()
+            apply()
+        }
+    }
 }
+

@@ -76,6 +76,12 @@ dependencies {
 
     implementation(libs.ktor.serialization.kotlinx.json)
 
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.mockito.inline)
 
 
 }

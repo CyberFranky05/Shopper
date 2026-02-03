@@ -1,6 +1,7 @@
 package com.piyush.shopper.di
 
 
+import com.piyush.shopper.ui.feature.Profile.ProfileViewModel
 import com.piyush.shopper.ui.feature.Summary.CartSummaryViewModel
 import com.piyush.shopper.ui.feature.account.login.LoginViewModel
 import com.piyush.shopper.ui.feature.account.register.RegisterViewModel
@@ -21,12 +22,14 @@ val viewModelModule = module {
 
     viewModel {
         ProductDetailsViewModel(
+            get(),
             get()
         )
     }
 
     viewModel {
         CartViewModel(
+            get(),
             get(),
             get(),
             get()
@@ -36,24 +39,36 @@ val viewModelModule = module {
     viewModel {
         CartSummaryViewModel(
             get(),
+            get(),
             get()
         )
     }
 
     viewModel {
-        OrdersViewModel(get())
+        OrdersViewModel(get(),
+            get()
+        )
     }
 
     viewModel {
         LoginViewModel(
+            get(),
             get()
         )
     }
 
     viewModel {
         RegisterViewModel(
+            get(),
             get()
         )
+    }
+
+    viewModel {
+        ProfileViewModel(
+            get()
+        )
+
     }
 
 }

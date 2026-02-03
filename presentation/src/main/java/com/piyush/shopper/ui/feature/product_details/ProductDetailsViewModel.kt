@@ -13,7 +13,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ProductDetailsViewModel (val usecase : AddToCartUseCase): ViewModel(){
+class ProductDetailsViewModel (
+    val usecase : AddToCartUseCase,
+    private val ShopperSession: ShopperSession
+): ViewModel(){
 
 
     private val _state = MutableStateFlow<ProductDetailEvent>(ProductDetailEvent.Nothing)

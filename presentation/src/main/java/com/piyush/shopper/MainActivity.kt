@@ -43,6 +43,7 @@ import com.piyush.shopper.Navigation.UserAddressRouteWrapper
 import com.piyush.shopper.Navigation.productNavType
 import com.piyush.shopper.Navigation.userAddressNavType
 import com.piyush.shopper.model.UiProductModel
+import com.piyush.shopper.ui.feature.Profile.ProfileScreen
 import com.piyush.shopper.ui.feature.Summary.CartSummaryScreen
 import com.piyush.shopper.ui.feature.account.login.LoginScreen
 import com.piyush.shopper.ui.feature.account.register.RegisterScreen
@@ -52,6 +53,7 @@ import com.piyush.shopper.ui.feature.orders.OrdersScreen
 import com.piyush.shopper.ui.feature.product_details.ProductDetailsScreen
 import com.piyush.shopper.ui.feature.user_address.UserAddressScreen
 import com.piyush.shopper.ui.theme.ShopperTheme
+import org.koin.android.ext.android.inject
 import kotlin.reflect.typeOf
 
 class MainActivity : ComponentActivity() {
@@ -59,6 +61,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val shopperSession: ShopperSession by inject()
             ShopperTheme {
                 val shouldShowBottomNav = remember {
                     mutableStateOf(true)
@@ -81,7 +84,7 @@ class MainActivity : ComponentActivity() {
 
                         NavHost(
                             navController = navController,
-                            startDestination = if (ShopperSession.getUser() != null) {
+                            startDestination = if (shopperSession.getUser() != null) {
                                 HomeScreen
                             } else {
                                 LoginScreen
@@ -110,9 +113,7 @@ class MainActivity : ComponentActivity() {
                             }
                             composable<ProfileScreen> {
                                 shouldShowBottomNav.value = true
-                                Box(modifier = Modifier.fillMaxSize()) {
-                                    Text(text = "Profile")
-                                }
+                                ProfileScreen(navController=navController)
                             }
                             composable<CartSummaryScreen> {
                                 shouldShowBottomNav.value = false

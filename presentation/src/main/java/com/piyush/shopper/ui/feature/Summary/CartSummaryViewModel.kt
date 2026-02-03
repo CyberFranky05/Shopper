@@ -17,7 +17,8 @@ import kotlinx.coroutines.launch
 
 class CartSummaryViewModel(
     private val cartSummaryUseCase: CartSummaryUseCase,
-    private val placeOrderUseCase: PlaceOrderUsecase
+    private val placeOrderUseCase: PlaceOrderUsecase,
+    private val ShopperSession: ShopperSession
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CartSummaryEvent>(CartSummaryEvent.Loading)
